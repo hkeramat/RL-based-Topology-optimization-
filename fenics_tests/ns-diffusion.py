@@ -37,7 +37,10 @@ bcu_cylinder = DirichletBC(V, Constant((0, 0)), cylinder)
 bcp_outflow = DirichletBC(Q, Constant(0), outflow)
 bcu = [bcu_inflow, bcu_walls, bcu_cylinder]
 bcp = [bcp_outflow]
-bc = DirichletBC(C, Constant(1.0), cylinder)
+
+bc_c = DirichletBC(C, Constant(300.0), cylinder)
+bc_in = DirichletBC(C, Constant(450.0), inflow)
+bc = [bc_c, bc_in]
 
 # Define trial and test functions
 u = TrialFunction(V)
@@ -52,7 +55,7 @@ u_n = Function(V)
 u_  = Function(V)
 p_n = Function(Q)
 p_  = Function(Q)
-c_n = Function(C)
+c_n = interpolate(Expression("273.0", degree=2), C)
 
 # Define expressions used in variational forms
 U  = 0.5*(u_n + u)
