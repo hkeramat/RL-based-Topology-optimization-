@@ -1,6 +1,8 @@
 from fenics import *
 from mshr import *
 import numpy as np
+import numpy as np
+import matplotlib.pyplot as plt
 
 T = 5.0            # final time
 num_steps = 5000   # number of time steps
@@ -9,6 +11,7 @@ mu = 0.001         # dynamic viscosity
 rho = 1            # density
 D = 0.01           # diffusion rate
 save_each = 10     # number of time steps to skip when saving
+plot_each = 20
 
 # Create mesh
 channel = Rectangle(Point(0, 0), Point(2.0, 2.0))
@@ -149,6 +152,16 @@ for n in range(num_steps):
         xdmffile_u.write(u_, t)
         xdmffile_p.write(p_, t)
         vtkfile_c << (c, t)
+
+    if (n % plot_each == 0):
+        tol = 0.001  # avoid hitting points outside the domain
+        y = np.linspace(0 + tol, 2.0 - tol, 101)
+        points = [(0, y_) for y_ in y]
+        p_line = np.array([p_(point) for point in points])
+        plt.plot(y, p_line, 'b', linewidth=2)
+        plt.xlabel('$y$')
+        plt.savefig(f'figs/p_curve-{n}.png')
+        plt.clf()
 
     # Update previous solution
     u_n.assign(u_)
