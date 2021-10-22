@@ -163,6 +163,13 @@ for n in range(num_steps):
         plt.savefig(f'figs/p_curve-{n}.png')
         plt.clf()
 
+        points = [(2.0, y_) for y_ in y]
+        t_line = np.array([c(point) for point in points])
+        plt.plot(y, t_line, 'r', linewidth=2)
+        plt.xlabel('$y$')
+        plt.savefig(f'figs/t_curve-{n}.png')
+        plt.clf()
+
     # Update previous solution
     u_n.assign(u_)
     p_n.assign(p_)
