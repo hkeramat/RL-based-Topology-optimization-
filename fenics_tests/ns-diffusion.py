@@ -1,5 +1,6 @@
 from fenics import *
 from mshr import *
+import os
 import numpy as np
 import numpy as np
 import matplotlib.pyplot as plt
@@ -120,6 +121,9 @@ xdmffile_p.parameters["flush_output"] = True
 # Create progress bar
 progress = Progress('Looping', num_steps)
 # set_log_level(LogLevel.PROGRESS)
+
+if not os.path.isdir("figs"):
+    os.makedirs("figs")
 
 c = Function(C)
 
