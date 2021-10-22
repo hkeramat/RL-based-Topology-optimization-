@@ -119,7 +119,7 @@ xdmffile_p.parameters["flush_output"] = True
 
 # Create progress bar
 progress = Progress('Looping', num_steps)
-set_log_level(LogLevel.PROGRESS)
+# set_log_level(LogLevel.PROGRESS)
 
 c = Function(C)
 
@@ -169,6 +169,12 @@ for n in range(num_steps):
         plt.xlabel('$y$')
         plt.savefig(f'figs/t_curve-{n}.png')
         plt.clf()
+
+        p_average = np.average(p_line)
+        c_average = np.average(t_line)
+        print(f"=====> Averaged pressure at inlet: {p_average} <=====")
+        print(f"=====> Averaged temperate at outlet: {c_average} <=====")
+
 
     # Update previous solution
     u_n.assign(u_)
