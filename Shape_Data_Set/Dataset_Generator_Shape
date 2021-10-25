@@ -6,7 +6,7 @@ from   datetime import datetime
 import progress.bar
 
 -------------------------------------------------------------
-from shapes_utils import *
+from shape_generator import *
 from meshes_utils import *
 --------------------------------------------------------------
 
