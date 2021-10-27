@@ -16,30 +16,45 @@ plot_each = 20     # number of time steps to skip for saving plots
 
 # Create mesh
 channel = Rectangle(Point(0, 0), Point(2.0, 2.0)) # define the box
-cylinder = Circle(Point(1.0, 1.0), 0.20) # define the internal obstacle
+cylinder = Circle(Point(1.0, 0.4), 0.30) # define the internal obstacle
 domain = channel - cylinder # create the domain by trimming the box
 mesh = generate_mesh(domain, 64) # generate the mesh
 
+# Sub domain for Periodic boundary condition
+class PeriodicBoundary(SubDomain):
+    # bottom boundary is "target domain" G
+    def inside(self, x, on_boundary):
+        return bool(x[1] < DOLFIN_EPS and x[1] > -DOLFIN_EPS and on_boundary)
+
+    # map bottom boundary (H) to top boundary (G)
+    # map coordinates x in H to coordinates y in G
+    def map(self, x, y):
+        y[1] = x[1] - 2.0 # the dimension along y axis
+        y[0] = x[0]
+
+# Create periodic boundary condition
+pbc = PeriodicBoundary()
+
 # Define function spaces
-C = FunctionSpace(mesh, 'P', 1) # for the temperature
-V = VectorFunctionSpace(mesh, 'P', 2) # for velocity (as a vector)
-Q = FunctionSpace(mesh, 'P', 1) # for pressure
+C = FunctionSpace(mesh, 'P', 1, constrained_domain=pbc) # for the temperature
+V = VectorFunctionSpace(mesh, 'P', 2, constrained_domain=pbc) # for velocity (as a vector)
+Q = FunctionSpace(mesh, 'P', 1, constrained_domain=pbc) # for pressure
 
 # Define boundaries
 inflow   = 'near(x[0], 0)'
 outflow  = 'near(x[0], 2.0)'
-walls    = 'near(x[1], 0) || near(x[1], 2.0)'
-cylinder = 'on_boundary && x[0]>0.6 && x[0]<1.4 && x[1]>0.6 && x[1]<1.4' # internal obstacle
+# walls    = 'near(x[1], 0) || near(x[1], 2.0)'
+cylinder = 'on_boundary && x[0]>0.6 && x[0]<1.4 && x[1]>0.05 && x[1]<0.8' # internal obstacle
 
 # Define inflow profile
 inflow_profile = ('4.0*1.5*x[1]*(2.0 - x[1]) / pow(2.0, 2)', '0') # u-shape profile of the inlet velocity
 
 # Define boundary conditions
 bcu_inflow = DirichletBC(V, Expression(inflow_profile, degree=2), inflow) # fixed velocity BC on inlet
-bcu_walls = DirichletBC(V, Constant((0, 0)), walls) # no_slip BC on walls
+# bcu_walls = DirichletBC(V, Constant((0, 0)), walls) # no_slip BC on walls
 bcu_cylinder = DirichletBC(V, Constant((0, 0)), cylinder) # no_slip BC on obstacle
 bcp_outflow = DirichletBC(Q, Constant(0), outflow) # zero pressure BC on outlet
-bcu = [bcu_inflow, bcu_walls, bcu_cylinder] # NS velcoity BCs
+bcu = [bcu_inflow, bcu_cylinder] # NS velcoity BCs
 bcp = [bcp_outflow] # NS pressure BCs
 
 bc_c = DirichletBC(C, Constant(300.0), cylinder) # constant temperate on obstacle
