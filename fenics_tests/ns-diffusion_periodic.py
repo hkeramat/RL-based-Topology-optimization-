@@ -26,7 +26,7 @@ class PeriodicBoundary(SubDomain):
     def inside(self, x, on_boundary):
         return bool(x[1] < DOLFIN_EPS and x[1] > -DOLFIN_EPS and on_boundary)
 
-    # map bottom boundary (H) to top boundary (G)
+    # map top boundary (H) to bottom boundary (G)
     # map coordinates x in H to coordinates y in G
     def map(self, x, y):
         y[1] = x[1] - 2.0 # the dimension along y axis
