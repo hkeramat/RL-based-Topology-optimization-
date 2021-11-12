@@ -8,7 +8,7 @@ import numpy             as np
 import matplotlib.pyplot as plt
 
 
-from shapes_generator  import *
+from shape_generator  import *
 from meshes_utils  import *
 from fenics_solver import *
 
